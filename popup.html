@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avito Cleaner</title>
+    <style>
+      body {
+        box-sizing: border-box;
+        width: 280px;
+        margin: 0;
+        padding: 18px;
+        color: #111;
+        font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .description {
+        margin: 4px 0 0;
+        color: #666;
+        font-size: 12px;
+      }
+
+      .switch {
+        position: relative;
+        flex: 0 0 auto;
+        width: 42px;
+        height: 24px;
+      }
+
+      .switch input {
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
+
+      .slider {
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        background: #bbb;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .slider::before {
+        position: absolute;
+        bottom: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        content: "";
+        transition: transform 0.2s;
+      }
+
+      input:checked + .slider {
+        background: #00aaff;
+      }
+
+      input:checked + .slider::before {
+        transform: translateX(18px);
+      }
+
+      input:focus-visible + .slider {
+        outline: 2px solid #111;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div>
+        <h1 class="title">Avito Cleaner</h1>
+        <p class="description" id="status">Загрузка…</p>
+      </div>
+      <label class="switch">
+        <input id="toggle" type="checkbox" aria-label="Включить Avito Cleaner">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

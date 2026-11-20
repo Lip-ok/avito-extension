@@ -1,22 +1,22 @@
 const toggle = document.getElementById('toggle');
+const status = document.getElementById('status');
 
-// загрузка состояния
+function render(enabled) {
+  toggle.checked = enabled;
+  status.textContent = enabled ? 'Расширение включено' : 'Расширение выключено';
+}
+
 chrome.storage.sync.get(['enabled'], (result) => {
-  toggle.checked = result.enabled ?? true;
+  render(result.enabled ?? true);
 });
 
-// переключение
-toggle.addEventListener('change', async () => {
+toggle.addEventListener('change', () => {
   const enabled = toggle.checked;
+  render(enabled);
 
-  // сохраняем
-  chrome.storage.sync.set({ enabled });
-
-  // отправляем в активную вкладку
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  chrome.tabs.sendMessage(tab.id, {
-    type: 'TOGGLE',
-    enabled
+  chrome.storage.sync.set({ enabled }, () => {
+    if (chrome.runtime.lastError) {
+      render(!enabled);
+    }
   });
 });

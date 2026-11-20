@@ -31,16 +31,14 @@ function stop() {
   }
 }
 
-// Инициализация
 chrome.storage.sync.get(['enabled'], (result) => {
   const enabled = result.enabled ?? true;
   if (enabled) start();
 });
 
-// Слушаем переключатель
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === 'TOGGLE') {
-    if (msg.enabled) {
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.enabled) {
+    if (changes.enabled.newValue) {
       start();
     } else {
       stop();
