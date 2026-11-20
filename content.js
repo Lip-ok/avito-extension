@@ -1,11 +1,63 @@
 let observer = null;
 
-function removeModal() {
-  const el = document.querySelector('div[role="dialog"]');
-  if (el) {
-    el.remove();
+const VPN_BLOCK_MESSAGE = 'возможно, у вас включен vpn';
+const REFRESH_MESSAGE = 'обновить страницу';
+
+function normalizeText(text) {
+  return text
+    .toLocaleLowerCase('ru')
+    .replaceAll('ё', 'е')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function hasVpnBlockMessage(element) {
+  const text = normalizeText(element.textContent || '');
+  return text.includes(VPN_BLOCK_MESSAGE) && text.includes(REFRESH_MESSAGE);
+}
+
+function findVpnBlocker() {
+  const dialog = Array.from(document.querySelectorAll('[role="dialog"]'))
+    .find(hasVpnBlockMessage);
+
+  if (dialog) {
+    return dialog;
   }
 
+  const heading = Array.from(
+    document.querySelectorAll('h1, h2, h3, [role="heading"]')
+  ).find((element) =>
+    normalizeText(element.textContent || '').includes(VPN_BLOCK_MESSAGE)
+  );
+
+  if (!heading) {
+    return null;
+  }
+
+  let element = heading.parentElement;
+  let contentContainer = null;
+
+  while (element && element !== document.body) {
+    if (hasVpnBlockMessage(element)) {
+      contentContainer ??= element;
+    }
+
+    const style = getComputedStyle(element);
+    if (style.position === 'fixed' && hasVpnBlockMessage(element)) {
+      return element;
+    }
+
+    element = element.parentElement;
+  }
+
+  return contentContainer;
+}
+
+function removeVpnBlocker() {
+  const blocker = findVpnBlocker();
+  if (!blocker) return;
+
+  blocker.remove();
   document.body.style.overflow = '';
   document.body.style.position = '';
   document.body.style.width = '';
@@ -15,11 +67,12 @@ function removeModal() {
 function start() {
   if (observer) return;
 
-  removeModal();
+  removeVpnBlocker();
 
-  observer = new MutationObserver(removeModal);
+  observer = new MutationObserver(removeVpnBlocker);
   observer.observe(document.body, {
     childList: true,
+    characterData: true,
     subtree: true
   });
 }
